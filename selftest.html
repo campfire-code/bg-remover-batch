@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="UTF-8" /><title>抠图自检（开发用）</title></head>
+<body><pre id="out">running</pre><div id="imgs"></div><script type="module">
+import { removeBackground } from '/src/tool/remove.ts';
+// 合成一张「商品图」：杂色背景上一个红色杯子
+const c = document.createElement('canvas'); c.width = 1200; c.height = 900;
+const g = c.getContext('2d');
+const grd = g.createLinearGradient(0, 0, 1200, 900); grd.addColorStop(0, '#8a9a7b'); grd.addColorStop(1, '#5d6b8a');
+g.fillStyle = grd; g.fillRect(0, 0, 1200, 900);
+for (let i = 0; i < 400; i++) { g.fillStyle = `hsla(${(i * 37) % 360},30%,60%,.25)`; g.fillRect((i * 97) % 1200, (i * 53) % 900, 30, 30); }
+g.fillStyle = '#c0392b'; g.beginPath(); g.roundRect(480, 260, 260, 400, [40, 40, 60, 60]); g.fill();
+g.strokeStyle = '#c0392b'; g.lineWidth = 34; g.beginPath(); g.arc(760, 440, 70, -Math.PI / 2, Math.PI / 2); g.stroke();
+g.fillStyle = '#ecf0f1'; g.fillRect(520, 340, 180, 40);
+const src = new Uint8Array(await (await new Promise((r) => c.toBlob(r, 'image/jpeg', 0.9))).arrayBuffer());
+const res = [];
+const t0 = performance.now();
+for (const [bg, size, mime] of [['#FFFFFF', 800, 'image/jpeg'], [null, 0, 'image/png']]) {
+  const r = await removeBackground(src, { background: bg, size, marginPct: 8, mime, quality: 92 }, () => {});
+  const head = Array.from(r.data.slice(0, 4)).map((b) => b.toString(16).padStart(2, '0')).join('');
+  res.push(`${bg ?? '透明'} ${r.width}x${r.height} 主体=${JSON.stringify(r.box)} magic=${head} ${r.data.length}B`);
+  const im = new Image(); im.src = URL.createObjectURL(new Blob([r.data])); im.style.cssText = 'width:300px;border:1px solid #ccc;background:repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/16px 16px'; document.getElementById('imgs').append(im);
+}
+res.push(`耗时 ${Math.round(performance.now() - t0)}ms`);
+try { await removeBackground(new Uint8Array([1,2,3]), { background: '#fff', size: 800, marginPct: 8, mime: 'image/jpeg', quality: 90 }, () => {}); } catch (e) { res.push('损坏图片：' + e.message); }
+document.getElementById('out').textContent = res.join('\n');
+</script></body></html>
