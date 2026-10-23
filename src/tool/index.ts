@@ -1,4 +1,5 @@
 // 工具声明：主图一键白底（批量）
+import { Eraser as EraserAsIcon } from 'lucide-react';
 import type { BatchTool } from '../kit/types';
 import { normalizeColor, outName } from './core';
 import { removeBackground } from './remove';
@@ -9,6 +10,7 @@ const tool: BatchTool = {
   id: 'e03',
   name: '主图一键白底（批量）',
   tagline: '自动抠出商品主体，换成白底或透明底，按电商主图尺寸居中排好。全部在本机完成，不联网、不上传。',
+  icon: EraserAsIcon,
   category: '电商运营',
   type: 'media',
   mode: 'batch',
