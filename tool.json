@@ -2,12 +2,13 @@
   "id": "e03",
   "slug": "bg-remover-batch",
   "name": "主图一键白底（批量）",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "repo": "campfire-code/bg-remover-batch",
   "license": "MIT",
   "ui": {
-    "layout": "e",
-    "palette": "green"
+    "layout": "f",
+    "palette": "green",
+    "accent": "#B81E45"
   },
   "upstream": {
     "repo": "danielgatis/rembg",

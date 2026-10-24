@@ -2,16 +2,26 @@
 import type { Row } from '../kit/runner';
 
 function product(hue: number, done: boolean) {
+  const S = 360;
   const c = document.createElement('canvas');
-  c.width = c.height = 200;
+  c.width = c.height = S;
   const g = c.getContext('2d')!;
-  if (done) { g.fillStyle = '#FFFFFF'; g.fillRect(0, 0, 200, 200); } else {
-    const grd = g.createLinearGradient(0, 0, 200, 200);
-    grd.addColorStop(0, `hsl(${(hue + 40) % 360} 25% 55%)`); grd.addColorStop(1, `hsl(${(hue + 90) % 360} 20% 35%)`);
-    g.fillStyle = grd; g.fillRect(0, 0, 200, 200);
+  // 原图：木纹桌面加杂物，商品偏左下；结果图：纯白底，商品居中放大
+  if (done) { g.fillStyle = '#FFFFFF'; g.fillRect(0, 0, S, S); } else {
+    g.fillStyle = `hsl(${(hue + 30) % 360} 32% 48%)`; g.fillRect(0, 0, S, S);
+    for (let i = 0; i < 26; i++) { g.fillStyle = i % 2 ? 'rgb(255 255 255 / .07)' : 'rgb(0 0 0 / .08)'; g.fillRect(0, i * 15, S, 7); }
+    g.fillStyle = `hsl(${(hue + 120) % 360} 35% 55% / .8)`; g.beginPath(); g.arc(290, 70, 40, 0, 7); g.fill();
+    g.fillStyle = 'rgb(240 230 200 / .85)'; g.fillRect(24, 40, 70, 54);
   }
-  g.fillStyle = `hsl(${hue} 55% 42%)`;
-  g.beginPath(); g.roundRect(done ? 66 : 70, done ? 34 : 50, done ? 68 : 60, done ? 132 : 110, 14); g.fill();
+  const k = done ? 1.55 : 1;
+  const ox = done ? S / 2 - 52 * k : 70;
+  const oy = done ? S / 2 - 70 * k : 130;
+  g.save(); g.translate(ox, oy); g.scale(k, k);
+  g.fillStyle = 'rgb(0 0 0 / .16)'; g.beginPath(); g.ellipse(50, 134, 42, 7, 0, 0, 7); g.fill();
+  g.fillStyle = `hsl(${hue} 55% 42%)`; g.beginPath(); g.roundRect(18, 20, 64, 114, 14); g.fill();
+  g.fillStyle = '#E4E6EA'; g.beginPath(); g.roundRect(22, 6, 56, 18, 6); g.fill();
+  g.fillStyle = 'rgb(255 255 255 / .3)'; g.fillRect(28, 44, 9, 70);
+  g.restore();
   return c.toDataURL('image/png');
 }
 const files: [string, number, Row['status'], string?][] = [
